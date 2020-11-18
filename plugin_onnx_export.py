@@ -25,7 +25,7 @@ class MemoryEfficientHSwish(nn.Module):
         return HSwishImplementation.apply(x, self.bias)
 
 
-# 一个通过本框架实现的插件
+# 一个通过本框架实现的插件  自定义实现跟踪图
 class MReLUImplementation(torch.autograd.Function):
 
     @staticmethod
@@ -59,6 +59,7 @@ class FooModel(torch.nn.Module):
     def forward(self, input1, input2):
         return self.mrelu(input2) + self.hswish(input1)
 
+# 构建模型
 dummy_input1 = torch.zeros((1, 3, 3, 3))
 dummy_input2 = torch.zeros((1, 3, 3, 3))
 model = FooModel()
@@ -67,5 +68,5 @@ dummy_input1[...] = 0.25
 dummy_input2[...] = 0
 out = model(dummy_input1, dummy_input2)
 print(out)
-
+# 导出onnx模型
 torch.onnx.export(model, (dummy_input1, dummy_input2), 'workspace/models/demo.onnx', verbose=True)
